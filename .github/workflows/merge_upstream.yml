@@ -27,13 +27,13 @@ jobs:
       - name: Compare changes
         id: compare
         run: |
-          git diff --name-only HEAD origin/main
+          git diff --name-only HEAD origin/merge_upstreamfixtest
           echo "changes=$(git diff --name-only HEAD origin/main)" >> "$GITHUB_OUTPUT"
 
       - name: Push all changes
         if: ${{ steps.compare.outputs.changes != '' }}
         run: |
-          git push origin main
+          git push origin merge_upstreamfixtest
 
       - name: Trigger build
         uses: peter-evans/repository-dispatch@v2.1.1
