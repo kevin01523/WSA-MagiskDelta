@@ -1,4 +1,4 @@
-# Magisk on WSA (with Google Apps)
+# Magisk Delta on WSA (with Google Apps)
 
 > ## Grab the latest release from [releases](https://github.com/creative-builds/WSA-Magisk/releases/latest).
 >
@@ -50,7 +50,7 @@
 
 ## Features
 
-- Integrate Magisk and GApps in a few clicks within minutes
+- Integrate Magisk Delta and GApps in a few clicks within minutes
 - Keep each build up to date
 - Support both ARM64 and x64
 - Support all OpenGApps variants except for aroma (aroma does not support x86_64, please use super instead)
@@ -68,14 +68,14 @@
 2. Clone the repo to local:
 
    ```bash
-   git clone https://github.com/LSPosed/MagiskOnWSALocal.git --depth 1
+   git clone https://github.com/kevin01523/WSA-MagiskDelta.git --depth 1
    ```
 
 3. Run `cd scripts`.
 4. Then run `./build.sh --help` (optional) to get the usage if you want to use CLI.
 5. Run `./run.sh` under scripts directory.
 6. Select the WSA version and its architecture (mostly x64).
-7. Select the version of Magisk.
+7. Select the version of Magisk Delta.
 8. Choose which brand of GApps you want to install:
    - OpenGApps
 
@@ -95,7 +95,7 @@
         3. Input `PowerShell.exe -ExecutionPolicy Bypass -File .\Install.ps1` and press `Enter`.
         4. The script will run and WSA will be installed.
         5. If this workaround does not work, your PC is not supported for WSA.
-13. Magisk/Play Store will be launched. Enjoy by installing LSPosed-Zygisk with Zygisk enabled or Riru and LSPosed-Riru.
+13. Magisk Delta/Play Store will be launched. Enjoy by installing LSPosed-Zygisk with Zygisk enabled or Riru and LSPosed-Riru.
 
 ---
 
@@ -123,7 +123,7 @@
 
   `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalState\diagnostics\logcat`
 
-- How can I update Magisk to a newer version?
+- How can I update Magisk Delta to a newer version?
 
   Do the same as updating WSA.
 
@@ -187,6 +187,7 @@
 
 - [StoreLib](https://github.com/StoreDev/StoreLib): API for downloading WSA
 - [Magisk](https://github.com/topjohnwu/Magisk): The most famous root solution on Android
+- [Magisk Delta](https://huskydg.github.io/magisk-files/): Modified Fork of famous root solution on Android
 - [The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution
 - [WSA-Kernel-SU](https://github.com/LSPosed/WSA-Kernel-SU) and [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/): The kernel `su` for debugging Magisk Integration
 - [WSAGAScript](https://github.com/ADeltaX/WSAGAScript): The first GApps integration script for WSA
