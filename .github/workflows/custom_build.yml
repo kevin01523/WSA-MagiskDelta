@@ -13,7 +13,7 @@ on:
         description: Release type of WSA. RP means Release Preview, WIS means Insider Slow, WIF means Insider Fas
         required: true
         options: ["retail","RP","WIS","WIF"]
-        default: "retail"
+        default: "WIF"
       magisk-ver:
         type: choice
         description: Magisk version.
@@ -25,7 +25,7 @@ on:
         description: GApps brand. none for no integration of GApps
         required: true
         options: ["OpenGApps","MindTheGapps","none"]
-        default: "MindTheGapps"
+        default: "OpenGApps"
       gapps-variant:
         type: choice
         description: GApps variant.
@@ -48,7 +48,7 @@ on:
         description: Compress format.
         required: true
         options: ["zip","7z","xz"]
-        default: "7z"
+        default: "zip"
 
 jobs:
   custbuild:
@@ -62,12 +62,12 @@ jobs:
       - name: Install Dependencies 🧑‍🏭
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y whiptail setools lzip wine patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils unzip cabextract
-          sudo wget -P /usr/local/bin/ https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
-          sudo chmod +x /usr/local/bin/winetricks
-          wget -P /home/runner/.cache/winetricks/msxml6/ https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/wine/.cache/winetricks/msxml6/msxml6-KB973686-enu-amd64.exe
-          pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
-          winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+          sudo apt-get install -y whiptail lzip patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils qemu-utils unzip
+          # sudo wget -P /usr/local/bin/ https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
+          # sudo chmod +x /usr/local/bin/winetricks
+          # wget -P /home/runner/.cache/winetricks/msxml6/ https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/wine/.cache/winetricks/msxml6/msxml6-KB973686-enu-amd64.exe
+          python3 -m pip install -r scripts/requirements.txt -q
+          # winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
 
       - name: Grant exec permission to script 👑
         run: chmod +x ./scripts/build.sh
