@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [x64, arm64]
+        arch: [x64]
         root: [magisk, none]
-        gapps: [MindTheGapps, none]
+        gapps: [MindTheGapps, OpenGApps, none]
         release: [retail]
         compress-format: [7z]
 
@@ -31,7 +31,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y whiptail lzip patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils unzip cabextract
+          sudo apt-get install -y qemu-utils whiptail lzip patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils unzip cabextract
           #sudo apt-get install -y whiptail setools lzip wine patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils unzip cabextract
           #sudo wget -P /usr/local/bin/ https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
           #sudo chmod +x /usr/local/bin/winetricks
