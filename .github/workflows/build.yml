@@ -21,7 +21,7 @@ jobs:
         arch: [x64]
         root: [magisk, none]
         gapps: [MindTheGapps, OpenGApps, none]
-        release: [retail]
+        release: [retail, WIF]
         compress-format: [7z]
 
     steps:
