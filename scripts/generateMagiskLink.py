@@ -29,15 +29,15 @@ download_dir = Path.cwd().parent / "download" if sys.argv[2] == "" else Path(sys
 tempScript = sys.argv[3]
 print(f"Generating Magisk download link: release type={magisk_ver}", flush=True)
 if not magisk_ver:
-    magisk_ver = "stable"
+    magisk_ver = "debug"
 if magisk_ver == "stable" or magisk_ver == "beta" or magisk_ver == "canary" or magisk_ver == "debug":
     try:
         magisk_link = json.loads(requests.get(
-            f"https://raw.githubusercontent.com/HuskyDG/magisk-files/main/monet/canary.json").content)['magisk']['link']
+            f"https://raw.githubusercontent.com/HuskyDG/magisk-files/main/debug.json").content)['magisk']['link']
     except Exception:
         print("Failed to fetch from GitHub API, fallbacking to jsdelivr...")
         magisk_link = json.loads(requests.get(
-            f"https://raw.githubusercontent.com/HuskyDG/magisk-files/main/monet/canary.json").content)['magisk']['link']
+            f"https://raw.githubusercontent.com/HuskyDG/magisk-files/main/debug.json").content)['magisk']['link']
 print(f"download link: {magisk_link}", flush=True)
 
 with open(download_dir/tempScript, 'a') as f:
