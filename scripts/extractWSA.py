@@ -29,14 +29,9 @@ import shutil
 arch = sys.argv[1]
 
 zip_name = ""
-wsa_zip_path_raw = sys.argv[2]
-
-wsa_zip_path = Path(wsa_zip_path_raw).resolve()
-rootdir = Path(sys.argv[3]).resolve()
-env_file_raw = sys.argv[4]
-print(
-    f"wsa_zip_path_raw: {wsa_zip_path_raw}, env_file_raw: {env_file_raw}", flush=True)
-env_file = Path(env_file_raw).resolve()
+wsa_zip_path = Path(sys.argv[2])
+rootdir = Path(sys.argv[3])
+env_file = Path(sys.argv[4])
 
 workdir = rootdir / "wsa"
 archdir = Path(workdir / arch)
@@ -57,7 +52,7 @@ if not Path(archdir).is_dir():
     archdir.mkdir()
 uid = os.getuid()
 workdir_rw = os.access(workdir, os.W_OK)
-print(f"Uid {uid} can write to {workdir} {workdir_rw}", flush=True)
+print(f"Uid {uid} can write to {archdir} {workdir_rw}", flush=True)
 with zipfile.ZipFile(wsa_zip_path) as zip:
     for f in zip.filelist:
         if arch in f.filename.lower():
@@ -94,5 +89,6 @@ with zipfile.ZipFile(wsa_zip_path) as zip:
                         print(f"extracting {g.filename}", flush=True)
                         l.extract(g, archdir)
 with zipfile.ZipFile(zip_path) as zip:
+    stat = Path(zip_path).stat()
     print(f"unzipping from {zip_path}", flush=True)
     zip.extractall(archdir)
