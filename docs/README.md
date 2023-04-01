@@ -1,11 +1,11 @@
 # Magisk Delta on WSA (with Google Apps)
 
-> ## Grab the latest release from [releases](https://github.com/creative-builds/WSA-Magisk/releases/latest).
+> ## Grab the latest release from [releases](https://github.com/kevin01523/WSA-MagiskDelta/releases/latest).
 >
 > - Extract the package and execute `run.bat`. <br />
-> - Ask your queries in [discussion](https://github.com/creative-builds/WSA-Magisk/discussions).
+> - Ask your queries in [discussion](https://github.com/kevin01523/WSA-MagiskDelta/discussions).
 
-:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/creative-builds/WSA-Magisk) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
+:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/kevin01523/WSA-MagiskDelta) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
 
 ## Support for generating from these systems
 
