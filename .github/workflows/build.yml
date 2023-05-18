@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build WSA
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-2004
     strategy:
       matrix:
         arch: [x64]
