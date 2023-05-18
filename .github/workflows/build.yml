@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt-get update -y
+          sudo apt-get update -y && sudo apt-get upgrade && sudo apt-get dist-upgrade
           sudo apt install -y linux-modules-extra-azure
           #kernelver=$(uname -r | sed 's/-azure//' | tr '-' '.')
           #sudo apt update -y && sudo apt install -y linux-modules-extra-azure=$kernelver
