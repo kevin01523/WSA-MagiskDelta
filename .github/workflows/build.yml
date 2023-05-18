@@ -30,8 +30,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt-get update -y 
           sudo apt-get update -y
+          
           sudo apt-get install -y whiptail lzip patchelf e2fsprogs python3-pip p7zip-full attr qemu-utils unzip sudo python3-venv erofs-utils 
           python3 -m pip install -r scripts/requirements.txt -q
           #sudo apt-get upgrade -y
@@ -42,7 +42,8 @@ jobs:
           #wget -P /home/runner/.cache/winetricks/msxml6/ https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/wine/.cache/winetricks/msxml6/msxml6-KB973686-enu-amd64.exe
           pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
           #winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
-
+          kernelver=$(uname -r | sed 's/-azure//' | tr '-' '.')
+          apt update -y && apt install -y linux-modules-extra-azure=$kernelver*
       - name: Grant executable permission
         run: chmod +x ./scripts/build.sh
 
