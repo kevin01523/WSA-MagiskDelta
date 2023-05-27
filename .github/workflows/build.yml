@@ -20,10 +20,10 @@ jobs:
       matrix:
         arch: [x64]
         root: [magisk, none]
-        gapps: [MindTheGapps, none]
-       # gapps: [MindTheGapps, OpenGApps, none]
-       # release: [retail, WIF]
-        release: [retail]
+       # gapps: [MindTheGapps, none]
+        gapps: [MindTheGapps, OpenGApps, none]
+        release: [retail, WIF]
+       # release: [retail]
         compress-format: [7z]
 
     steps:
