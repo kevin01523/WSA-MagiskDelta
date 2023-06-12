@@ -60,7 +60,7 @@ jobs:
         
       - name: add timestamp
         id: date2
-        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT | cp ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }} ./output/$date2_${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
+        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT | cp ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }} ./output/${{ steps.date.outputs.date2 }}.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
           
 
       - name: Upload build to release
