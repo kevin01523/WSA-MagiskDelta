@@ -60,14 +60,14 @@ jobs:
         
       - name: add timestamp
         id: date2
-        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT | cp ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }} ./output/${{ steps.date.outputs.date2 }}_.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
+        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT | cp ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }} ./output/${{ steps.date2.outputs.date2 }}_.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
           
 
       - name: Upload build to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./output/${{ steps.date.outputs.date2 }}_.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
+          file: ./output/${{ steps.date2.outputs.date2 }}_.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
           tag: ${{ steps.date.outputs.date }}
           overwrite: true
           file_glob: true
