@@ -1,11 +1,8 @@
 # Magisk Delta on WSA (with Google Apps)
 
-> ## Grab the latest release from [releases](https://github.com/kevin01523/WSA-MagiskDelta/releases/latest).
->
-> - Extract the package and execute `run.bat`. <br />
-> - Ask your queries in [discussion](https://github.com/kevin01523/WSA-MagiskDelta/discussions).
+:warning: Magisk on WSA will no longer be available after March 5, 2025. [Learn more](https://learn.microsoft.com/en-us/windows/android/wsa/).
 
-:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/kevin01523/WSA-MagiskDelta) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
+:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/LSPosed/MagiskOnWSA) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
 
 ## Support for generating from these systems
 
@@ -13,11 +10,11 @@
 
   The following dependencies are required:
 
-  | DistrOS             |                                                         |            |              |                    |               |              |
-  |:-------------------:|---------------------------------------------------------|------------|--------------|--------------------|---------------|--------------|
-  | Debian              | `lzip patchelf e2fsprogs python3 aria2 attr unzip sudo` | `whiptail` | `qemu-utils` | `python3-venv`     | `python3-pip` | `p7zip-full` |
-  | openSUSE Tumbleweed | Same as above                                           | `dialog`   | `qemu-tools` | `python3-venvctrl` | Same as above                |
-  | Arch                | Same as Debian                                          | `libnewt`  | `qemu-img`   |  Same as Debian    | `python-pip`  | `p7zip`      |
+  | DistrOS             |                            |            |                    |               |               |
+  |:-------------------:|----------------------------|------------|--------------------|---------------|---------------|
+  | Debian              | `python3 aria2 unzip sudo` | `whiptail` | `python3-venv`     | `python3-pip` | `p7zip-full`  |
+  | openSUSE Tumbleweed | Same as above              | `dialog`   | `python3-venvctrl` | Same as above | Same as above |
+  | Arch                | Same as Debian             | `libnewt`  |  Same as Debian    | `python-pip`  | `p7zip`       |
 
   The python3 library `requests` is used.
 
@@ -156,13 +153,11 @@
 
   Or you can download the built package for 12.1 and 13 for x86_64 from [this page](https://sourceforge.net/projects/wsa-mtg/files/x86_64/).
 
-- Can I switch OpenGApps to MindTheGapps and keep user data in a previous build?
+- Is it possible to migrate data from a lower version like 2305 to a newer version?
 
-  No. You should wipe data after changing the GApps brand. Otherwise, you will find that the installed GApps are not recognized.
+  This is certainly available, Microsoft's change of read-only partition from 2305's EROFS to read-only EXT4 only affects the read-only system partition.
 
-- WSA with OpenGApps integrated fails to start.
-
-  OpenGApps has not yet released a version built for Android 12L and 13, only built for Android 11, which may not be compatible and thus cause crashes. Consider switching to MindTheGapps.
+  It has no effect on the user data partition. Check the logs if there is a failure to boot.
 
 - How to install KernelSU?
 
@@ -176,11 +171,10 @@
 
 - [StoreLib](https://github.com/StoreDev/StoreLib): API for downloading WSA
 - [Magisk](https://github.com/topjohnwu/Magisk): The most famous root solution on Android
-- [Magisk Delta](https://huskydg.github.io/magisk-files/): Modified Fork of famous root solution on Android
-- [The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution
+- ~~[The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution~~
 - [WSA-Kernel-SU](https://github.com/LSPosed/WSA-Kernel-SU) and [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/): The kernel `su` for debugging Magisk Integration
-- [WSAGAScript](https://github.com/ADeltaX/WSAGAScript): The first GApps integration script for WSA
-- [erofs-utils](https://github.com/sekaiacg/erofs-utils): Pre-build `erofs-utils` with erofsfuse enabled
+- ~~[WSAGAScript](https://github.com/ADeltaX/WSAGAScript): The first GApps integration script for WSA~~
+- ~~[erofs-utils](https://github.com/sekaiacg/erofs-utils): Pre-build `erofs-utils` with erofsfuse enabled~~
 
 _The repository is provided as a utility._
 
