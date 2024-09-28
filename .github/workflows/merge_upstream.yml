@@ -26,7 +26,7 @@ jobs:
           git fetch https://github.com/sn-o-w/WSA-Magisk main
           git merge --no-edit -X theirs
           git add .
-          git merge contimue
+          git merge main
 
 
         
