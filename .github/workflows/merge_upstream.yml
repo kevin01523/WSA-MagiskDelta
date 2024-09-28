@@ -23,8 +23,10 @@ jobs:
       
       - name: Merge changes from main
         run: |
-          git pull https://github.com/sn-o-w/WSA-Magisk main --no-edit -X theirs
-          git status
+          git fetch https://github.com/sn-o-w/WSA-Magisk main
+          git merge --no-edit -X theirs
+          git add .
+          git merge contimue
 
 
         
