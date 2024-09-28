@@ -1,4 +1,4 @@
-# Magisk on WSA (with Google Apps)
+# Magisk or Kitsune on WSA (with Google Apps)
 
 > ## Grab the latest release from [releases](https://github.com/sn-o-w/WSA-Magisk/releases/latest).
 >
@@ -44,7 +44,7 @@
 
 ## Features
 
-- Integrate Magisk and GApps in a few clicks within minutes
+- Integrate Magisk and Magisk Kitsune and GApps in a few clicks within minutes
 - Keep each build up to date
 - Support both ARM64 and x64
 - Support MindTheGapps
@@ -63,7 +63,7 @@
 2. Clone the repo to local:
 
    ```bash
-   git clone https://github.com/creative-builds/WSA-Magisk.git --depth 1
+   git clone https://github.com/kevin01523/WSA-MagiskDelta.git --depth 1
    ```
 
 3. Run `cd MagiskOnWSALocal`.
