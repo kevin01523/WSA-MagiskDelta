@@ -23,7 +23,7 @@ jobs:
         gapps: [LiteGapps]
         gapps-variant: [core]
         root: [magisk]
-        magisk-ver: [canary]
+        magisk-ver: [canary, delta]
         compress-format: [zip]
         preview-program-builds: [yes]
 
@@ -78,11 +78,21 @@ jobs:
         id: date
         run: echo "date=$(date +'v%Y-%m-%d')" >> "$GITHUB_OUTPUT"
 
+      - name: add timestamp
+        id: date2
+        run: echo "date2=$(date +'v%Y_%m_%d')" >> "$GITHUB_OUTPUT"
+        
+      - name: rename files
+        shell: bash
+        id: rename
+        run: cp "./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}"  "./output/${{ steps.date2.outputs.date2 }}.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}"
+
+
       - name: Upload build to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
+          file: ./output/${{ steps.date2.outputs.date2 }}.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
           tag: ${{ steps.date.outputs.date }}
           overwrite: true
           file_glob: true
