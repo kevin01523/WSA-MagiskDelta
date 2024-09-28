@@ -1,8 +1,12 @@
-# Magisk Delta on WSA (with Google Apps)
+# Magisk on WSA (with Google Apps)
+
+> ## Grab the latest release from [releases](https://github.com/sn-o-w/WSA-Magisk/releases/latest).
+>
+> - Extract the package and execute `run.bat`.
 
 :warning: Magisk on WSA will no longer be available after March 5, 2025. [Learn more](https://learn.microsoft.com/en-us/windows/android/wsa/).
 
-:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/LSPosed/MagiskOnWSA) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
+:warning: For fork developers: Please don't build using GitHub Actions, as GitHub will count your forked GitHub Actions usage against this upstream repository, which may cause this upstream repository gets disabled by GitHub staff like [MagiskOnWSA](https://github.com/creative-builds/WSA-Magisk) because of numerous forks building GitHub Actions, and counting the forks' Action usage against this upstream repository.
 
 ## Support for generating from these systems
 
@@ -10,11 +14,11 @@
 
   The following dependencies are required:
 
-  | DistrOS             |                            |            |                    |               |               |
-  |:-------------------:|----------------------------|------------|--------------------|---------------|---------------|
-  | Debian              | `python3 aria2 unzip sudo` | `whiptail` | `python3-venv`     | `python3-pip` | `p7zip-full`  |
-  | openSUSE Tumbleweed | Same as above              | `dialog`   | `python3-venvctrl` | Same as above | Same as above |
-  | Arch                | Same as Debian             | `libnewt`  |  Same as Debian    | `python-pip`  | `p7zip`       |
+  | DistrOS             |                                                         |            |              |                    |               |              |
+  |:-------------------:|---------------------------------------------------------|------------|--------------|--------------------|---------------|--------------|
+  | Debian              | `lzip patchelf e2fsprogs python3 aria2 attr unzip sudo` | `whiptail` | `qemu-utils` | `python3-venv`     | `python3-pip` | `p7zip-full` |
+  | openSUSE Tumbleweed | Same as above                                           | `dialog`   | `qemu-tools` | `python3-venvctrl` | Same as above                |
+  | Arch                | Same as Debian                                          | `libnewt`  | `qemu-img`   |  Same as Debian    | `python-pip`  | `p7zip`      |
 
   The python3 library `requests` is used.
 
@@ -40,10 +44,11 @@
 
 ## Features
 
-- Integrate Magisk Delta and GApps in a few clicks within minutes
+- Integrate Magisk and GApps in a few clicks within minutes
 - Keep each build up to date
 - Support both ARM64 and x64
 - Support MindTheGapps
+- Support LiteGapps
 - Remove Amazon Appstore
 - Fix VPN dialog not showing (use our [VpnDialogs app](https://github.com/LSPosed/VpnDialogs))
 - Add device administration feature
@@ -58,7 +63,7 @@
 2. Clone the repo to local:
 
    ```bash
-   git clone https://github.com/kevin01523/WSA-MagiskDelta.git --depth 1
+   git clone https://github.com/creative-builds/WSA-Magisk.git --depth 1
    ```
 
 3. Run `cd MagiskOnWSALocal`.
@@ -67,10 +72,11 @@
 6. Select the version of Magisk.
 7. Choose which brand of GApps you want to install:
    - MindTheGapps
+   - LiteGapps
 
-     There is no other variant we can choose.
+     There is no other variant we can choose from MindTheGapps.
 8. Select the root solution (none means no root).
-9. If you are running the script for the first time, it will take some time to complete. After the script completes, two new folders named `output` and `download` will be generated in the `MagiskOnWSALocal` folder. Go to the `output` folder. While running the `./run.sh` script in the step 3, if you selected `Yes` for `Do you want to compress the output?` then in `output` folder you will see a compressed file called `WSA-with-magisk-stable-MindTheGapps_2207.40000.8.0_x64_Release-Nightly`or else there will be folder with the `WSA-with-magisk-stable-MindTheGapps_2207.40000.8.0_x64_Release-Nightly`. If there is a folder open it and skip to step 10. NOTE: The name of compressed file or the folder generated in the `output` folder may be different for you. It will be dependent on the choices made when executing `./run.sh`.
+9. If you are running the script for the first time, it will take some time to complete. After the script completes, two new folders named `output` and `download` will be generated in the `MagiskOnWSALocal` folder. Go to the `output` folder. While running the `./run.sh` script in the step 3, if you selected `Yes` for `Do you want to compress the output?`, you will find a compressed file in the `output` folder. Depending on the GApps brand you chose earlier, the compressed file will be named either `WSA-with-magisk-stable-MindTheGapps_2311.40000.5.0_x64_Release-Nightly` or `WSA-with-magisk-stable-LiteGapps_2311.40000.5.0_x64_Release-Nightly`. Otherwise, there will be a folder with any of these names. If a folder exists, open it and proceed to step 10. NOTE: The name of the compressed file or the folder generated in the `output` folder may be a little bit different for you, depending on the choices you made when executing `./run.sh`.
 10. Extract the compressed file and open the folder created after the extraction of the file.
 11. Here look for file `Run.bat` and run it.
     - If you previously have a MagiskOnWSA installation, it will automatically uninstall the previous one while **preserving all user data** and install the new one, so don't worry about your data.
@@ -109,7 +115,7 @@
 
   `%LOCALAPPDATA%\Packages\MicrosoftCorporationII.WindowsSubsystemForAndroid_8wekyb3d8bbwe\LocalState\diagnostics\logcat`
 
-- How can I update Magisk Delta to a newer version?
+- How can I update Magisk to a newer version?
 
   Do the same as updating WSA.
 
@@ -153,11 +159,17 @@
 
   Or you can download the built package for 12.1 and 13 for x86_64 from [this page](https://sourceforge.net/projects/wsa-mtg/files/x86_64/).
 
-- Is it possible to migrate data from a lower version like 2305 to a newer version?
+- Where can I download LiteGapps?
 
-  This is certainly available, Microsoft's change of read-only partition from 2305's EROFS to read-only EXT4 only affects the read-only system partition.
+  You can download the built packages for multiple Android versions for x86_64 from [this page](https://sourceforge.net/projects/litegapps/files/litegapps/x86_64/).
 
-  It has no effect on the user data partition. Check the logs if there is a failure to boot.
+- Can I switch OpenGApps to MindTheGapps or LiteGapps and keep user data in a previous build?
+
+  No. You should wipe data after changing the GApps brand. Otherwise, you will find that the installed GApps are not recognized.
+
+- WSA with OpenGApps integrated fails to start.
+
+  OpenGApps has not yet released a version built for Android 12L and 13, only built for Android 11, which may not be compatible and thus cause crashes. Consider switching to MindTheGapps or LiteGapps.
 
 - How to install KernelSU?
 
@@ -169,12 +181,14 @@
 
 ## Credits
 
+- [Upstream Repository](https://github.com/LSPosed/MagiskOnWSALocal): MagiskOnWSALocal by LSPosed
 - [StoreLib](https://github.com/StoreDev/StoreLib): API for downloading WSA
 - [Magisk](https://github.com/topjohnwu/Magisk): The most famous root solution on Android
-- ~~[The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution~~
-- [WSA-Kernel-SU](https://github.com/LSPosed/WSA-Kernel-SU) and [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/): The kernel `su` for debugging Magisk Integration
-- ~~[WSAGAScript](https://github.com/ADeltaX/WSAGAScript): The first GApps integration script for WSA~~
-- ~~[erofs-utils](https://github.com/sekaiacg/erofs-utils): Pre-build `erofs-utils` with erofsfuse enabled~~
+- [The Open GApps Project](https://opengapps.org): One of the most famous Google Apps packages solution
+- [LiteGapps](https://litegapps.github.io): A compact, user-friendly, and comprehensive custom GApps package
+- [WSA-Kernel-SU](https://github.com/tiann/KernelSU): A Kernel based root solution for Android(https://git.zx2c4.com/kernel-assisted-superuser/): The kernel `su` for debugging Magisk Integration
+- [Kernel Assisted Superuser](https://git.zx2c4.com/kernel-assisted-superuser): Kernel assisted means of gaining a root shell for Android
+- [erofs-utils](https://github.com/sekaiacg/erofs-utils): Pre-build `erofs-utils` with erofsfuse enabled
 
 _The repository is provided as a utility._
 

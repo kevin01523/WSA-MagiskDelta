@@ -1,43 +1,44 @@
+# Integrated Preview Program builds within Custom Build workflow
 name: Custom Build
 on:
   workflow_dispatch:
     inputs:
       arch:
         type: choice
-        description: Architecture of WSA.
+        description: Target CPU architecture of WSA.
         required: true
-        options: [x64, arm64]
-        default: x64
+        options: ["x64","arm64"]
+        default: "x64"
       release-type:
         type: choice
-        description: Release type of WSA. RP means Release Preview, WIS means Insider Slow, WIF means Insider Fas
+        description: Release type of WSA. RP=Release Preview; WIS=Insider Slow; WIF=Insider Fast; PP=Preview Program
         required: true
-        options: ["retail","RP","WIS","WIF"]
-        default: "WIF"
-      magisk-ver:
-        type: choice
-        description: Magisk version.
-        required: true
-        options: ["stable","beta","canary","debug"]
-        default: "stable"
+        options: ["retail","RP","WIS","WIF","PP"]
+        default: "retail"
       gapps-brand:
         type: choice
         description: GApps brand. none for no integration of GApps
         required: true
-        options: ["OpenGApps","MindTheGapps","none"]
-        default: "OpenGApps"
+        options: ["OpenGApps","MindTheGapps","LiteGapps","none"]
+        default: "LiteGapps"
       gapps-variant:
         type: choice
         description: GApps variant.
         required: true
-        options: ["super","stock","full","mini","micro","nano","pico","tvstock","tvmini"]
-        default: "pico"
+        options: ["super (OpenGApps)","stock (OpenGApps)","full (OpenGApps)","mini (OpenGApps)","micro (OpenGApps/LiteGapps)","nano (OpenGApps/LiteGapps)","pico (OpenGApps)","tvstock (OpenGApps)","tvmini (OpenGApps)","pixel (LiteGapps)","basic (LiteGapps)","user (LiteGapps)","go (LiteGapps)","core (LiteGapps)","lite (LiteGapps)"]
+        default: "core (LiteGapps)"
       root-sol:
         type: choice
         description: Root solution. none means no root.
         required: true
-        options: ["magisk","none"]
+        options: ["magisk","kernelsu","none"]
         default: "magisk"
+      magisk-ver:
+        type: choice
+        description: Magisk version.
+        required: true
+        options: ["stable","beta","canary","debug","delta","alpha"]
+        default: "canary"
 #       remove-amazon:
 #         description: Remove Amazon Appstore from the system
 #         required: true
@@ -47,7 +48,7 @@ on:
         type: choice
         description: Compress format.
         required: true
-        options: ["zip","7z","xz"]
+        options: ["zip","7z"]
         default: "zip"
 
 jobs:
@@ -57,24 +58,97 @@ jobs:
 
     steps:
       - name: Checkout ♻️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies 🧑‍🏭
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: lzip patchelf e2fsprogs python3 python3-pip aria2 p7zip-full attr unzip sudo whiptail qemu-utils
+          version: 1.0
+
+      - name: Install Python venv & its libraries 🐍
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y whiptail lzip patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils qemu-utils unzip
-          # sudo wget -P /usr/local/bin/ https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
-          # sudo chmod +x /usr/local/bin/winetricks
-          # wget -P /home/runner/.cache/winetricks/msxml6/ https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/wine/.cache/winetricks/msxml6/msxml6-KB973686-enu-amd64.exe
-          python3 -m pip install -r scripts/requirements.txt -q
-          # winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+          python3 -c "import venv" >/dev/null 2>&1 || {
+              if ! (sudo apt-get install "python3-venv"); then
+                  abort
+              fi
+          }
+          echo "Creating python3 virtual env"
+          python3 -m venv --system-site-packages "$(dirname "$PWD")/python3-env" || {
+               echo "Failed to upgrade python3 virtual env, clear and recreate"
+               python3 -m venv --clear --system-site-packages "$(dirname "$PWD")/python3-env" || abort "Failed to create python3 virtual env"
+          }
+          source "$(dirname "$PWD")/python3-env/bin/activate" || abort "Failed to activate python3 virtual env"
+          python3 -c "import pkg_resources; pkg_resources.require(open('scripts/requirements.txt',mode='r'))" &>/dev/null || {
+               echo "Installing Python3 dependencies"
+               python3 -m pip install -r scripts/requirements.txt || abort "Failed to install python3 dependencies"
+          }
+          deactivate
+
+      - name: Add Microsoft identity for Program Preview, if PP is chosen 🧙🏻‍♂️
+        if: inputs.release-type == 'PP' && env.USER_CODE != null
+        env:
+          USER_CODE: ${{ secrets.USER_CODE }}
+        run: |
+          mkdir -p ./download/ >/dev/null 2>&1
+          echo "user_code=$USER_CODE" > ./download/.ms_account
+
+      - name: Download build from Program Preview when no Microsoft identity set, if PP is chosen 🧙🏻‍♂️
+        if: inputs.release-type == 'PP' && env.USER_CODE == null
+        env:
+          USER_CODE: ${{ secrets.USER_CODE }}
+        run: |
+          mkdir -p ./download/ >/dev/null 2>&1
+          # wget --progress=bar:force:noscroll -O ./download/wsa-WIF.zip $(wget -q -O - https://api.github.com/repos/MustardChef/WSAPackages/releases/latest | jq -r '.assets[] | .browser_download_url')
+          # tag=$(wget -q -O - "https://api.github.com/repos/MustardChef/WSAPackages/tags" | jq -r '.[0].name'); wget --progress=bar:force:noscroll -O ./download/wsa-WIF.zip "https://github.com/MustardChef/WSAPackages/releases/download/${tag}/MicrosoftCorporationII.WindowsSubsystemForAndroid_${tag#WSA_}_neutral_._8wekyb3d8bbwe.Msixbundle"
+          tag=$(wget -q -O - "https://api.github.com/repos/bubbles-wow/WSA-Archive/tags" | jq -r '.[0].name'); wget --progress=bar:force:noscroll -O ./download/wsa-WIF.zip "https://github.com/bubbles-wow/WSA-Archive/releases/download/${tag}/MicrosoftCorporationII.WindowsSubsystemForAndroid_${tag}_neutral_._8wekyb3d8bbwe.Msixbundle"
+
+      # Microsoft component packages no longer needed since this commit -> https://github.com/sn-o-w/WSA-Magisk/commits?author=Doddddd
+      # - name: Download build from WSA Program Preview + VCLibs 14 + UI XAML manually when no Microsoft identity set, if PP is chosen 🧙🏻‍♂️
+        # if: inputs.release-type == 'PP' && env.USER_CODE == null
+        # env:
+          # USER_CODE: ${{ secrets.USER_CODE }}
+        # run: |
+          # mkdir -p ./download/ >/dev/null 2>&1
+          # wget -O ./download/wsa-WIF.zip $(wget -cq -O - https://api.github.com/repos/MustardChef/WSAPackages/releases/latest | jq -r '.assets[] | .browser_download_url')
+          # wget -O ./download/Microsoft.VCLibs.140.00.UWPDesktop_${{ inputs.arch }}.appx https://aka.ms/Microsoft.VCLibs.${{ inputs.arch }}.14.00.Desktop.appx
+          # wget -O ./download/Microsoft.VCLibs.140.00_${{ inputs.arch }}.appx https://cdn.glitch.global/847a3043-7118-4fd2-8853-fe9756f88702/Microsoft.VCLibs.140.00_14.0.32530.0_${{ inputs.arch }}__8wekyb3d8bbwe.Appx
+          # wget -P ./download/xaml https://globalcdn.nuget.org/packages/microsoft.ui.xaml.2.8.4.nupkg
+          # 7z x ./download/xaml/*.nupkg -o./download/xaml/
+          # mv ./download/xaml/tools/AppX/${{ inputs.arch }}/Release/*.appx ./download/Microsoft.UI.Xaml.2.8_${{ inputs.arch }}.appx
+          # rm -rf ./download/xaml
 
       - name: Grant exec permission to script 👑
         run: chmod +x ./scripts/build.sh
 
       - name: Build WSA 🏗️
         id: wsa
-        run: ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --magisk-ver ${{ inputs.magisk-ver }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --remove-amazon --compress-format ${{ inputs.compress-format }}
+        run: |
+          gapps_favour=$(echo "${{ inputs.gapps-variant }}" | awk -F' \\(' '{print $1}')
+          if [[ "${{ inputs.gapps-brand }}" == "OpenGApps" ]]; then
+            if [[ "$gapps_favour" != "super" && "$gapps_favour" != "stock" && "$gapps_favour" != "full" && "$gapps_favour" != "mini" && "$gapps_favour" != "micro" && "$gapps_favour" != "nano" && "$gapps_favour" != "pico" && "$gapps_favour" != "tvstock" && "$gapps_favour" != "tvmini" ]]; then
+              gapps_variant="--gapps-variant pico"
+            else
+              gapps_variant="--gapps-variant $gapps_favour"
+            fi
+          elif [[ "${{ inputs.gapps-brand }}" == "LiteGapps" ]]; then
+            if [[ "$gapps_favour" != "pixel" && "$gapps_favour" != "micro" && "$gapps_favour" != "nano" && "$gapps_favour" != "basic" && "$gapps_favour" != "user" && "$gapps_favour" != "go" && "$gapps_favour" != "core" && "$gapps_favour" != "lite" ]]; then
+              gapps_variant="--gapps-variant lite"
+            else
+              gapps_variant="--gapps-variant $gapps_favour"
+            fi
+          else
+            gapps_variant=""
+          fi
+          if [[ "${{ inputs.release-type }}" != "PP" ]]; then
+            ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} $gapps_variant --root-sol ${{ inputs.root-sol }} --magisk-ver ${{ inputs.magisk-ver }} --remove-amazon --compress-format ${{ inputs.compress-format }}
+          else
+            if [ -f "./download/.ms_account" ]; then
+              ./scripts/build.sh --arch ${{ inputs.arch }} --release-type WIF --gapps-brand ${{ inputs.gapps-brand }} $gapps_variant --root-sol ${{ inputs.root-sol }} --magisk-ver ${{ inputs.magisk-ver }} --remove-amazon --compress-format ${{ inputs.compress-format }}
+            else
+              ./scripts/build.sh --arch ${{ inputs.arch }} --release-type WIF --gapps-brand ${{ inputs.gapps-brand }} $gapps_variant --root-sol ${{ inputs.root-sol }} --magisk-ver ${{ inputs.magisk-ver }} --remove-amazon --skip-download-wsa --compress-format ${{ inputs.compress-format }}
+            fi
+          fi
 
       - name: Upload Artifact 🤌
         uses: actions/upload-artifact@v3

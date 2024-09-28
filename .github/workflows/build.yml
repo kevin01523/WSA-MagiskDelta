@@ -1,7 +1,7 @@
 name: Build WSA Magisk
 on:
-  #schedule:
-  #  - cron: "30 2 1 * *"
+  schedule:
+    - cron: "0 13 * * 1,4"
   push:
     branches: [main]
   workflow_dispatch:
@@ -19,59 +19,70 @@ jobs:
     strategy:
       matrix:
         arch: [x64]
-        root: [magisk, none]
-       # gapps: [MindTheGapps, none]
-        gapps: [MindTheGapps, OpenGApps, none]
-        release: [retail, WIF]
-       # release: [retail]
-        compress-format: [7z]
+        release: [WIF]
+        gapps: [LiteGapps]
+        gapps-variant: [core]
+        root: [magisk]
+        magisk-ver: [canary]
+        compress-format: [zip]
+        preview-program-builds: [yes]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: lzip patchelf e2fsprogs python3 python3-pip aria2 p7zip-full attr unzip sudo whiptail qemu-utils
+          version: 1.0
+
+      - name: Install Python venv & its libraries
         run: |
-          sudo apt-get update -y 
-          #sudo apt install -y linux-modules-extra-azure
-          #kernelver=$(uname -r | sed 's/-azure//' | tr '-' '.')
-          #sudo apt update -y && sudo apt install -y linux-modules-extra-azure=$kernelver
-          sudo apt-get install -y whiptail lzip patchelf e2fsprogs python3-pip p7zip-full attr qemu-utils unzip sudo python3-venv erofs-utils 
-          python3 -m pip install -r scripts/requirements.txt -q
-          #sudo apt-get upgrade -y
-          #sudo apt-get install -y libfuse2 lzip patchelf e2fsprogs python3 python3-pip aria2 p7zip-full attr unzip sudo erofs-utils whiptail qemu-utils python3-venv
-          #sudo apt-get install -y whiptail setools lzip wine patchelf e2fsprogs python3-pip aria2 p7zip-full attr xz-utils unzip cabextract
-          #sudo wget -P /usr/local/bin/ https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks
-          #sudo chmod +x /usr/local/bin/winetricks
-          #wget -P /home/runner/.cache/winetricks/msxml6/ https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/wine/.cache/winetricks/msxml6/msxml6-KB973686-enu-amd64.exe
-          #pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
-          #winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
-          
+          python3 -c "import venv" >/dev/null 2>&1 || {
+              if ! (sudo apt-get install "python3-venv"); then
+                  abort
+              fi
+          }
+          echo "Creating python3 virtual env"
+          python3 -m venv --system-site-packages "$(dirname "$PWD")/python3-env" || {
+               echo "Failed to upgrade python3 virtual env, clear and recreate"
+               python3 -m venv --clear --system-site-packages "$(dirname "$PWD")/python3-env" || abort "Failed to create python3 virtual env"
+          }
+          source "$(dirname "$PWD")/python3-env/bin/activate" || abort "Failed to activate python3 virtual env"
+          python3 -c "import pkg_resources; pkg_resources.require(open('scripts/requirements.txt',mode='r'))" &>/dev/null || {
+               echo "Installing Python3 dependencies"
+               python3 -m pip install -r scripts/requirements.txt || abort "Failed to install python3 dependencies"
+          }
+          deactivate
+          if [[ "${{ matrix.preview-program-builds }}" == "yes" ]]; then
+            mkdir -p ./download/ >/dev/null 2>&1
+            # wget --progress=bar:force:noscroll -O ./download/wsa-${{ matrix.release }}.zip $(wget -q -O - https://api.github.com/repos/MustardChef/WSAPackages/releases/latest | jq -r '.assets[] | .browser_download_url')
+            # tag=$(wget -q -O - "https://api.github.com/repos/MustardChef/WSAPackages/tags" | jq -r '.[0].name'); wget --progress=bar:force:noscroll -O ./download/wsa-${{ matrix.release }}.zip "https://github.com/MustardChef/WSAPackages/releases/download/${tag}/MicrosoftCorporationII.WindowsSubsystemForAndroid_${tag#WSA_}_neutral_._8wekyb3d8bbwe.Msixbundle"
+            tag=$(wget -q -O - "https://api.github.com/repos/bubbles-wow/WSA-Archive/tags" | jq -r '.[0].name'); wget --progress=bar:force:noscroll -O ./download/wsa-${{ matrix.release }}.zip "https://github.com/bubbles-wow/WSA-Archive/releases/download/${tag}/MicrosoftCorporationII.WindowsSubsystemForAndroid_${tag}_neutral_._8wekyb3d8bbwe.Msixbundle"
+          fi
+
       - name: Grant executable permission
         run: chmod +x ./scripts/build.sh
 
       - name: Build WSA GAPPS ${{ matrix.root }} ${{ matrix.arch }}
         id: wsa
-        run: ./scripts/build.sh --arch ${{ matrix.arch }} --release-type ${{ matrix.release }} --magisk-ver stable --gapps-brand ${{ matrix.gapps }} --root-sol ${{ matrix.root }} --remove-amazon --compress-format ${{ matrix.compress-format }}
+        run: |
+          if [[ "${{ matrix.preview-program-builds }}" == "yes" ]]; then
+            ./scripts/build.sh --arch ${{ matrix.arch }} --release-type ${{ matrix.release }} --gapps-brand ${{ matrix.gapps }} --gapps-variant ${{ matrix.gapps-variant }} --root-sol ${{ matrix.root }} --magisk-ver ${{ matrix.magisk-ver }} --remove-amazon --skip-download-wsa --compress-format ${{ matrix.compress-format }}
+          else
+            ./scripts/build.sh --arch ${{ matrix.arch }} --release-type ${{ matrix.release }} --gapps-brand ${{ matrix.gapps }} --gapps-variant ${{ matrix.gapps-variant }} --root-sol ${{ matrix.root }} --magisk-ver ${{ matrix.magisk-ver }} --remove-amazon --compress-format ${{ matrix.compress-format }}
+          fi
 
       - name: Prepare release tag
         id: date
-        run: echo "date=$(date +'v%Y-%m-%d')" >> $GITHUB_OUTPUT
-        
-      - name: add timestamp
-        id: date2
-        run: echo "date2=$(date +'v%Y_%m_%d')" >> $GITHUB_OUTPUT
-      
-      - name: rename files
-        shell: bash
-        id: rename
-        run: cp "./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}"  "./output/${{ steps.date2.outputs.date2 }}.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}"
+        run: echo "date=$(date +'v%Y-%m-%d')" >> "$GITHUB_OUTPUT"
 
       - name: Upload build to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./output/${{ steps.date2.outputs.date2 }}.${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
+          file: ./output/${{ steps.wsa.outputs.artifact }}.${{ matrix.compress-format }}
           tag: ${{ steps.date.outputs.date }}
           overwrite: true
           file_glob: true
