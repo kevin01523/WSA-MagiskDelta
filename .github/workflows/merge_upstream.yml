@@ -13,25 +13,33 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GH_PATS }} 
 
       - name: Setup git
         run: |
-          git config --global user.email ${{ github.actor }}@users.noreply.github.com
-          git config --global user.name ${{ github.actor }}
+          git config --global user.email ${{ github.repository_owner_id }}+${{ github.repository_owner }}@users.noreply.github.com
+          git config --global user.name ${{ github.repository_owner }}
           git config --global pull.rebase false
-
+      
       - name: Merge changes from main
         run: |
-          git pull https://github.com/LSPosed/MagiskOnWSALocal main --no-edit
-
+          git pull https://github.com/sn-o-w/WSA-Magisk main --no-edit -X theirs
+        
       - name: Compare changes
         id: compare
         run: |
           git diff --name-only HEAD origin/main
-          echo "changes=$(git diff --name-only HEAD origin/main  | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
-
+          echo "changes=$(git diff --name-only HEAD origin/main | tr '\n' ' ' )" >> "$GITHUB_OUTPUT"
+          
       - name: Push all changes
         if: ${{ steps.compare.outputs.changes != '' }}
         run: |
           git push origin main
+
+      - name: Trigger build
+        uses: peter-evans/repository-dispatch@v2.1.1
+        if: ${{ steps.compare.outputs.changes != '' }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: build
+        
