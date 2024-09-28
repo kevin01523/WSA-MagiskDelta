@@ -24,6 +24,8 @@ jobs:
       - name: Merge changes from main
         run: |
           git pull https://github.com/sn-o-w/WSA-Magisk main --no-edit -X theirs
+          git status
+
 
         
       - name: Compare changes
