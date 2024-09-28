@@ -24,9 +24,7 @@ jobs:
       - name: Merge changes from main
         run: |
           git fetch https://github.com/sn-o-w/WSA-Magisk main
-          git merge https://github.com/sn-o-w/WSA-Magisk/main --no-edit -X theirs
-          git add .
-          git merge https://github.com/sn-o-w/WSA-Magisk/main --continue
+          git merge -s recursive -X theirs origin/master
 
 
         
