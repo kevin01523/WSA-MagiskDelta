@@ -23,7 +23,7 @@ jobs:
       
       - name: Merge changes from main
         run: |
-          git fetch https://github.com/sn-o-w/WSA-Magisk main  -s recursive -X theirs
+          git pull https://github.com/sn-o-w/WSA-Magisk main  -s recursive -X theirs
 
 
 
