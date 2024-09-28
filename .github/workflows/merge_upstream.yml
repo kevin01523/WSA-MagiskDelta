@@ -24,7 +24,8 @@ jobs:
       - name: Merge changes from main
         run: |
           git fetch https://github.com/sn-o-w/WSA-Magisk main
-          git merge -s recursive -X theirs origin/master
+          git remote show
+          git merge -s recursive -X theirs origin main
 
 
         
